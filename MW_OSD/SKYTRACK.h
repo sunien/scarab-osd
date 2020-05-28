@@ -126,8 +126,8 @@ void DrawSkytrack(){
   screenBuffer[t_offset] = 0;
   if (voltage<voltageWarning){
     if (timer.Blink2hz){
-      MAX7456_WriteString_P(skytracktext0, SL_WARN_POS);
-      MAX7456_WriteString(screenBuffer,SL_VOLT_POS);
+      OSD_WriteString_P(skytracktext0, SL_WARN_POS);
+      OSD_WriteString(screenBuffer,SL_VOLT_POS);
     }
   }
 // VOLTAGE
@@ -141,22 +141,22 @@ void DrawSkytrack(){
 //CO-ORDINATES
     screenBuffer[0] = SYM_LAT;
     FormatGPSCoord(GPS_latitude, screenBuffer + 1, 4, 'N', 'S');
-    MAX7456_WriteString(screenBuffer, SL_LAT_POS);
+    OSD_WriteString(screenBuffer, SL_LAT_POS);
     screenBuffer[0] = SYM_LON;
     FormatGPSCoord(GPS_longitude, screenBuffer + 1, 4, 'E', 'W');
-    MAX7456_WriteString(screenBuffer, SL_LON_POS);
+    OSD_WriteString(screenBuffer, SL_LON_POS);
 //CO-ORDINATES
   
 //SATS
-  MAX7456_WriteString("SAT",SL_SAT_POS);
+  OSD_WriteString("SAT",SL_SAT_POS);
   itoa(GPS_numSat,screenBuffer,10);
-  MAX7456_WriteString(screenBuffer,SL_SAT_POS+5); 
+  OSD_WriteString(screenBuffer,SL_SAT_POS+5); 
 //SATS
 
 //SERIAL PACKET COUNT    
-  MAX7456_WriteString("PKT",SL_PKT_POS);
+  OSD_WriteString("PKT",SL_PKT_POS);
   itoa(packetrate,screenBuffer,10);
-  MAX7456_WriteString(screenBuffer,SL_PKT_POS+5);
+  OSD_WriteString(screenBuffer,SL_PKT_POS+5);
 //SERIAL PACKET COUNT      
 
 

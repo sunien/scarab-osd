@@ -999,56 +999,67 @@ enum {
     # define ATMEGASETHARDWAREPORTS pinMode(RSSIPIN, INPUT);pinMode(RCPIN, INPUT);
 #endif 
 
-#ifdef RUSHDUINO                    
-    # define DATAOUT          11 // MOSI
-    # define DATAIN           12 // MISO
-    # define SPICLOCK         13 // sck
-    # define VSYNC             2 // INT0
-    # define MAX7456RESET      9 // RESET
-    # define MAX7456SELECT    10 // CHIP SELECT 
-    # define MAX7456SETHARDWAREPORTS  pinMode(MAX7456RESET,OUTPUT);pinMode(MAX7456SELECT,OUTPUT);pinMode(DATAOUT, OUTPUT);pinMode(DATAIN, INPUT);pinMode(SPICLOCK,OUTPUT);pinMode(VSYNC, INPUT);
-    # define MAX7456HWRESET   digitalWrite(MAX7456RESET,LOW);delay(60);digitalWrite(MAX7456RESET,HIGH);delay(40);
-    # define MAX7456ENABLE    digitalWrite(MAX7456SELECT,LOW); 
-    # define MAX7456DISABLE   digitalWrite(MAX7456SELECT,HIGH); 
-    # define LEDINIT          pinMode(LEDPIN,OUTPUT);
-    # define LEDON            digitalWrite(LEDPIN,HIGH);
-    # define LEDOFF           digitalWrite(LEDPIN,LOW); 
-#elif defined ARDUINO_OSD // Example for Arduino guys                     
-    # define DATAOUT          11 // MOSI
-    # define DATAIN           12 // MISO
-    # define SPICLOCK         13 // sck
-    # define VSYNC             2 // INT0
-    # define MAX7456SELECT     6 // ss
-    # define MAX7456RESET     10 // RESET
-    # define MAX7456SETHARDWAREPORTS  pinMode(MAX7456RESET,OUTPUT);pinMode(MAX7456SELECT,OUTPUT);pinMode(DATAOUT, OUTPUT);pinMode(DATAIN, INPUT);pinMode(SPICLOCK,OUTPUT);pinMode(VSYNC, INPUT);
-    # define MAX7456HWRESET   digitalWrite(MAX7456RESET,LOW);delay(60);digitalWrite(MAX7456RESET,HIGH);delay(40);
-    # define MAX7456ENABLE    digitalWrite(MAX7456SELECT,LOW); 
-    # define MAX7456DISABLE   digitalWrite(MAX7456SELECT,HIGH); 
-    # define LEDINIT          pinMode(LEDPIN,OUTPUT);
-    # define LEDON            digitalWrite(LEDPIN,HIGH);
-    # define LEDOFF           digitalWrite(LEDPIN,LOW);
-#elif defined STEELEPDB //                      
-    # define DATAOUT          11 // MOSI
-    # define DATAIN           12 // MISO
-    # define SPICLOCK         13 // sck
-    # define VSYNC             2 // INT0
-    # define MAX7456SELECT    10 // ss
-    # define MAX7456RESET      9 // RESET
-    # define MAX7456SETHARDWAREPORTS  pinMode(MAX7456RESET,OUTPUT);pinMode(MAX7456SELECT,OUTPUT);pinMode(DATAOUT, OUTPUT);pinMode(DATAIN, INPUT);pinMode(SPICLOCK,OUTPUT);pinMode(VSYNC, INPUT);
-    # define MAX7456HWRESET   digitalWrite(MAX7456RESET,LOW);delay(60);digitalWrite(MAX7456RESET,HIGH);delay(40);
-    # define MAX7456ENABLE    digitalWrite(MAX7456SELECT,LOW); 
-    # define MAX7456DISABLE   digitalWrite(MAX7456SELECT,HIGH); 
-    # define LEDINIT          pinMode(LEDPIN,OUTPUT);
-    # define LEDON            digitalWrite(LEDPIN,HIGH);
-    # define LEDOFF           digitalWrite(LEDPIN,LOW);
-#else                                  
-    # define MAX7456ENABLE    PORTD&=B10111111; 
-    # define MAX7456DISABLE   PORTD|=B01000000; 
-    # define MAX7456SETHARDWAREPORTS  DDRB|=B00101100;DDRB&=B11101111;DDRD|=B01000000;DDRD&=B11111011;
-    # define MAX7456HWRESET   PORTB&=B11111011;delay(100);PORTB|=B00000100;
-    # define LEDINIT          DDRD = DDRD|B10000000;
-    # define LEDON            PORTD|=B10000000;
-    # define LEDOFF           PORTD&=B01111111;
+#ifdef PIXELOSD
+    # define PIXELOSDRX         11 // PixelOSD SoftwareSerial RX pin
+    # define PIXELOSDTX         12 // PixelOSD SoftwareSerial TX pin
+    # undef LEDPIN
+    # define LEDPIN             13 // LED pin
+    # define OSDSETHARDWAREPORTS  pinMode(PIXELOSDRX,INPUT_PULLUP);pinMode(PIXELOSDTX,OUTPUT);
+    # define LEDINIT            pinMode(LEDPIN,OUTPUT);
+    # define LEDON              digitalWrite(LEDPIN,HIGH);
+    # define LEDOFF             digitalWrite(LEDPIN,LOW); 
+#else
+  #ifdef RUSHDUINO                    
+      # define DATAOUT          11 // MOSI
+      # define DATAIN           12 // MISO
+      # define SPICLOCK         13 // sck
+      # define VSYNC             2 // INT0
+      # define MAX7456RESET      9 // RESET
+      # define MAX7456SELECT    10 // CHIP SELECT 
+      # define OSDSETHARDWAREPORTS  pinMode(MAX7456RESET,OUTPUT);pinMode(MAX7456SELECT,OUTPUT);pinMode(DATAOUT, OUTPUT);pinMode(DATAIN, INPUT);pinMode(SPICLOCK,OUTPUT);pinMode(VSYNC, INPUT);
+      # define MAX7456HWRESET   digitalWrite(MAX7456RESET,LOW);delay(60);digitalWrite(MAX7456RESET,HIGH);delay(40);
+      # define MAX7456ENABLE    digitalWrite(MAX7456SELECT,LOW); 
+      # define MAX7456DISABLE   digitalWrite(MAX7456SELECT,HIGH); 
+      # define LEDINIT          pinMode(LEDPIN,OUTPUT);
+      # define LEDON            digitalWrite(LEDPIN,HIGH);
+      # define LEDOFF           digitalWrite(LEDPIN,LOW); 
+  #elif defined ARDUINO_OSD // Example for Arduino guys                     
+      # define DATAOUT          11 // MOSI
+      # define DATAIN           12 // MISO
+      # define SPICLOCK         13 // sck
+      # define VSYNC             2 // INT0
+      # define MAX7456SELECT     6 // ss
+      # define MAX7456RESET     10 // RESET
+      # define OSDSETHARDWAREPORTS  pinMode(MAX7456RESET,OUTPUT);pinMode(MAX7456SELECT,OUTPUT);pinMode(DATAOUT, OUTPUT);pinMode(DATAIN, INPUT);pinMode(SPICLOCK,OUTPUT);pinMode(VSYNC, INPUT);
+      # define MAX7456HWRESET   digitalWrite(MAX7456RESET,LOW);delay(60);digitalWrite(MAX7456RESET,HIGH);delay(40);
+      # define MAX7456ENABLE    digitalWrite(MAX7456SELECT,LOW); 
+      # define MAX7456DISABLE   digitalWrite(MAX7456SELECT,HIGH); 
+      # define LEDINIT          pinMode(LEDPIN,OUTPUT);
+      # define LEDON            digitalWrite(LEDPIN,HIGH);
+      # define LEDOFF           digitalWrite(LEDPIN,LOW);
+  #elif defined STEELEPDB //                      
+      # define DATAOUT          11 // MOSI
+      # define DATAIN           12 // MISO
+      # define SPICLOCK         13 // sck
+      # define VSYNC             2 // INT0
+      # define MAX7456SELECT    10 // ss
+      # define MAX7456RESET      9 // RESET
+      # define OSDSETHARDWAREPORTS  pinMode(MAX7456RESET,OUTPUT);pinMode(MAX7456SELECT,OUTPUT);pinMode(DATAOUT, OUTPUT);pinMode(DATAIN, INPUT);pinMode(SPICLOCK,OUTPUT);pinMode(VSYNC, INPUT);
+      # define MAX7456HWRESET   digitalWrite(MAX7456RESET,LOW);delay(60);digitalWrite(MAX7456RESET,HIGH);delay(40);
+      # define MAX7456ENABLE    digitalWrite(MAX7456SELECT,LOW); 
+      # define MAX7456DISABLE   digitalWrite(MAX7456SELECT,HIGH); 
+      # define LEDINIT          pinMode(LEDPIN,OUTPUT);
+      # define LEDON            digitalWrite(LEDPIN,HIGH);
+      # define LEDOFF           digitalWrite(LEDPIN,LOW);
+  #else                                  
+      # define MAX7456ENABLE    PORTD&=B10111111; 
+      # define MAX7456DISABLE   PORTD|=B01000000; 
+      # define OSDSETHARDWAREPORTS  DDRB|=B00101100;DDRB&=B11101111;DDRD|=B01000000;DDRD&=B11111011;
+      # define MAX7456HWRESET   PORTB&=B11111011;delay(100);PORTB|=B00000100;
+      # define LEDINIT          DDRD = DDRD|B10000000;
+      # define LEDON            PORTD|=B10000000;
+      # define LEDOFF           PORTD&=B01111111;
+  #endif
 #endif
 
 #if defined  KKAUDIOVARIO
@@ -1281,7 +1292,7 @@ enum {
 #ifdef iNAV
   #define INFO_CONTROLLER 12
 #endif
-#ifdef KISS 
+#ifdef KISS
   #define INFO_CONTROLLER 13
 #endif
 #ifdef APM
@@ -1363,12 +1374,16 @@ enum {
 #ifdef IMPULSERC_HELIX
   #define INFO_HARDWARE 11
 #endif
-#ifdef HOLYBROPDB
-  #define FFPV_INNOVA 12
+#ifdef FFPV_INNOVA
+  #define INFO_HARDWARE 12
 #endif
 #ifdef STEELEPDB
   #define INFO_HARDWARE 13
 #endif
+#ifdef PIXELOSD
+  #define INFO_HARDWARE 14
+#endif
+
 
 #if defined (SUBMARINE) || defined(GPSSUBMARINE)
   #define INFO_AIRCRAFT 3

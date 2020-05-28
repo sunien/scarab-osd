@@ -1,3 +1,5 @@
+#ifndef PIXELOSD
+
 #include "bitarray.h"
 
 // video mode register 0 bits
@@ -135,7 +137,7 @@ void MAX7456SoftReset(void)
 }
 #endif
 
-void MAX7456Setup(void)
+void OSD_Setup(void)
 {
   uint8_t MAX7456_reset=0x0C;
   uint8_t MAX_screen_rows;
@@ -230,14 +232,14 @@ void MAX7456Setup(void)
 // XXX (1) Prepare WriteString and WriteStringWithAttr
 // XXX (2) Pass call to WriteString to WriteStringWithAttr
 
-void MAX7456_WriteString(const char *string, int addr)
+void OSD_WriteString(const char *string, int addr)
 {
-  MAX7456_WriteStringWithAttr(string, addr, 0);
+  OSD_WriteStringWithAttr(string, addr, 0);
 }
 
-void MAX7456_WriteStringWithAttr(const char *string, int addr, int attr)
+void OSD_WriteStringWithAttr(const char *string, int addr, int attr)
 #else
-void MAX7456_WriteString(const char *string, int addr)
+void OSD_WriteString(const char *string, int addr)
 #endif
 {
   char *screenp = &screen[addr];
@@ -255,7 +257,7 @@ void MAX7456_WriteString(const char *string, int addr)
 }
 
 // Copy string from progmem into the screen buffer
-void MAX7456_WriteString_P(const char *string, int Adresse)
+void OSD_WriteString_P(const char *string, int Adresse)
 {
   char c;
   char *screenp = &screen[Adresse];
@@ -264,7 +266,7 @@ void MAX7456_WriteString_P(const char *string, int Adresse)
 }
 
 #ifdef CANVAS_SUPPORT
-void MAX7456_ClearScreen(void)
+void OSD_ClearScreen(void)
 {
   for(uint16_t xx = 0; xx < MAX_screen_size; ++xx) {
     screen[xx] = ' ';
@@ -298,7 +300,7 @@ void MAX7456_WaitVSYNC(void)
 }
 #endif
 
-void MAX7456_DrawScreen()
+void OSD_DrawScreen()
 {
   uint16_t xx;
 
@@ -325,7 +327,7 @@ void MAX7456_DrawScreen()
         screen[xx] = ' ' ;    
    }    
    for (uint8_t X = 0; X <= 3; X++) {
-     MAX7456_WriteString_P(PGMSTR(&(screen_test[X])), (LINE*5)+10+(X*LINE));
+     OSD_WriteString_P(PGMSTR(&(screen_test[X])), (LINE*5)+10+(X*LINE));
    }      
 #endif // SCREENTEST
 
@@ -389,7 +391,7 @@ void MAX7456_Send(uint8_t add, uint8_t data)
 #define DISABLE_display 0x00
 #define STATUS_reg_nvr_busy 0x20
 
-void write_NVM(uint8_t char_address)
+void OSD_WriteNVM(uint8_t char_address)
 {
 #ifdef WRITE_TO_MAX7456
   // disable display
@@ -419,7 +421,7 @@ void write_NVM(uint8_t char_address)
 }
 
 #if defined(AUTOCAM) || defined(MAXSTALLDETECT)
-void MAX7456CheckStatus(void){
+void OSD_CheckStatus(void){
   uint8_t srdata;
   MAX7456ENABLE
 
@@ -428,7 +430,7 @@ void MAX7456CheckStatus(void){
   srdata = spi_transfer(0xFF);
   srdata &= B00000011;
   if (detectedCamType != srdata) {
-    MAX7456Setup();
+    OSD_Setup();
     return;
   }
 #endif
@@ -438,23 +440,23 @@ void MAX7456CheckStatus(void){
   srdata = spi_transfer(0xFF); 
   
   if ((B00001000 & srdata) == 0)
-    MAX7456Setup(); 
+    OSD_Setup(); 
 #endif
 }
 #endif
 
 #if defined LOADFONT_DEFAULT || defined LOADFONT_LARGE || defined LOADFONT_BOLD || defined DISPLAYFONTS
-void displayFont()
+void OSD_DisplayFont()
 {
-  for(uint8_t x = 0; x < 255; x++) {
+  for(uint16_t x = 0; x < 256; x++) {
     screen[90+x] = x;
   }
 }
 
 #ifndef DISPLAYFONTS
-void updateFont()
+void OSD_UpdateFont()
 { 
-  for(uint8_t x = 0; x < 255; x++){
+  for(uint16_t x = 0; x < 256; x++){
     for(uint8_t i = 0; i < 54; i++){
       serialBuffer[1+i] = (uint8_t)pgm_read_byte(fontdata+(64*x)+i);
     }
@@ -471,3 +473,5 @@ void updateFont()
 }
 #endif
 #endif
+
+#endif // PIXELOSD

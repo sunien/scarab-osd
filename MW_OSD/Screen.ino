@@ -93,7 +93,7 @@ void FormatGPSCoord(uint16_t t_position, int32_t val, uint8_t t_cardinalaxis) { 
     screenBuffer[3] = '3';
   }
 
-   MAX7456_WriteString(screenBuffer, t_position);
+   OSD_WriteString(screenBuffer, t_position);
 }
 
 #ifdef VIRTUAL_NOSE
@@ -103,7 +103,7 @@ void displayVirtualNose(void)
   screenBuffer[0] = 0xC9;
   screenBuffer[1] = 0;
   uint16_t htpos = map(MwRcData[HTCHANNEL], 1000, 2000, -HTSCALE, HTSCALE);
-  MAX7456_WriteString(screenBuffer, (30 * HTLINE) + HTCENTER HTDIRECTION htpos);
+  OSD_WriteString(screenBuffer, (30 * HTLINE) + HTCENTER HTDIRECTION htpos);
 }
 #endif
 
@@ -159,7 +159,7 @@ void displayMode(void)
   }
   screenBuffer[xx] = 0;
   if (fieldIsVisible(sensorPosition)) {
-    MAX7456_WriteString(screenBuffer, getPosition(sensorPosition));
+    OSD_WriteString(screenBuffer, getPosition(sensorPosition));
   }
 #ifdef PROTOCOL_MAVLINK // override MWOSD mode icons
   strcpy_P(screenBuffer, (char*)pgm_read_word(&(mav_mode_index[mw_mav.mode])));
@@ -216,7 +216,7 @@ void displayMode(void)
 #endif  //PROTOCOL selection
 
   if (fieldIsVisible(ModePosition)) {
-    MAX7456_WriteString(screenBuffer, getPosition(ModePosition));
+    OSD_WriteString(screenBuffer, getPosition(ModePosition));
   }
 
 #ifdef APINDICATOR
@@ -240,7 +240,7 @@ void displayMode(void)
 #endif
   if (mw_mav.mode == MAVRTLID) { // RTL
     apactive = 2;
-    MAX7456_WriteString_P(PGMSTR(&(message_text[apactive])), getPosition(APstatusPosition));
+    OSD_WriteString_P(PGMSTR(&(message_text[apactive])), getPosition(APstatusPosition));
   }
   else if ((mw_mav.mode == MAVMISSIONID) & (GPS_waypoint_step > 0)) // Mission
     apactive = 4;
@@ -249,13 +249,13 @@ void displayMode(void)
     screenBuffer[1] = 0x50;
     screenBuffer[2] = SYM_COLON;
     itoa(GPS_waypoint_step, screenBuffer + 3, 10);
-    MAX7456_WriteString(screenBuffer, getPosition(APstatusPosition));
+    OSD_WriteString(screenBuffer, getPosition(APstatusPosition));
     xx = FindNull() + 1;
     uint16_t dist = GPS_waypoint_dist;
     if (Settings[S_UNITSYSTEM])
       dist = GPS_waypoint_dist * 3.2808;           // mt to feet
     formatDistance(dist, 1, 2, 0);
-    MAX7456_WriteString(screenBuffer, getPosition(APstatusPosition) + xx);
+    OSD_WriteString(screenBuffer, getPosition(APstatusPosition) + xx);
   }
 #else  // NOT PROTOCOL_MAVLINK       
   if (timer.Blink2hz)
@@ -278,7 +278,7 @@ void displayMode(void)
 #endif // EXTENDEDMODESUPPORT
   else
     return;
-  MAX7456_WriteString_P(PGMSTR(&(message_text[apactive])), getPosition(APstatusPosition));
+  OSD_WriteString_P(PGMSTR(&(message_text[apactive])), getPosition(APstatusPosition));
 #endif // PROTOCOL_MAVLINK     
 #endif
 }
@@ -290,7 +290,7 @@ void displayCallsign(int cposition)
     screenBuffer[X] = char(Settings[S_CS0 + X]);
   }
   screenBuffer[10] = 0;
-  MAX7456_WriteString(screenBuffer, cposition);
+  OSD_WriteString(screenBuffer, cposition);
 }
 
 void displayIcon(int cposition)
@@ -345,7 +345,7 @@ void displayHorizon(int rollAngle, int pitchAngle)
   }
   itoa(xx, screenBuffer + offset, 10);
   if (fieldIsVisible(pitchAnglePosition))
-    MAX7456_WriteString(screenBuffer, getPosition(pitchAnglePosition));
+    OSD_WriteString(screenBuffer, getPosition(pitchAnglePosition));
   screenBuffer[0] = SYM_ROLL;
   offset = 1;
   xx = abs(rollAngle / 10);
@@ -360,7 +360,7 @@ void displayHorizon(int rollAngle, int pitchAngle)
   }
   itoa(xx, screenBuffer + offset, 10);
   if (fieldIsVisible(rollAnglePosition))
-    MAX7456_WriteString(screenBuffer, getPosition(rollAnglePosition));
+    OSD_WriteString(screenBuffer, getPosition(rollAnglePosition));
 #endif
 
 #ifdef HORIZON
@@ -662,7 +662,7 @@ void OLDdisplayCurrentThrottle(void)
   }
   screenBuffer[0] = SYM_THR;
   screenBuffer[5 + THROTTLESPACE] = 0;
-  MAX7456_WriteString(screenBuffer, getPosition(CurrentThrottlePosition));
+  OSD_WriteString(screenBuffer, getPosition(CurrentThrottlePosition));
 }
 
 
@@ -676,11 +676,11 @@ void displayTimer(uint32_t t_time, uint16_t t_pos, uint8_t t_leadsymbol)
   if (t_leadsymbol>0){
     screenBuffer[0]=t_leadsymbol;
     screenBuffer[1]=0;
-    MAX7456_WriteString(screenBuffer, t_pos);  
+    OSD_WriteString(screenBuffer, t_pos);  
     t_pos++;
   }
   formatDateTime(digit0, digit1, 0, ':', 0);
-  MAX7456_WriteString(screenBuffer, t_pos);  
+  OSD_WriteString(screenBuffer, t_pos);  
 }
 
 
@@ -829,7 +829,7 @@ void displayI2CError(void)
   screenBuffer[0] = 0x49;
   screenBuffer[1] = 0X3A;
   itoa(I2CError, screenBuffer + 2, 10);
-  MAX7456_WriteString(screenBuffer, getPosition(temperaturePosition));
+  OSD_WriteString(screenBuffer, getPosition(temperaturePosition));
 #endif
 }
 
@@ -848,7 +848,7 @@ void displayRSSI(void)
   uint8_t xx = FindNull();
   screenBuffer[xx++] = '%';
   screenBuffer[xx] = 0;
-  MAX7456_WriteString(screenBuffer, getPosition(rssiPosition) + 30);
+  OSD_WriteString(screenBuffer, getPosition(rssiPosition) + 30);
 #else
   displayItem(rssiPosition, rssi, SYM_RSSI, '%', 0 );
 #endif
@@ -858,13 +858,13 @@ void displayRSSI(void)
 void displayIntro(void)
 {
   for (uint8_t X = 0; X <= 8; X++) {
-    MAX7456_WriteString_P(PGMSTR(&(intro_item[X])), 64 + (X * 30));
+    OSD_WriteString_P(PGMSTR(&(intro_item[X])), 64 + (X * 30));
   }
 #ifdef INTRO_CALLSIGN
   displayCallsign(64 + (30 * 6) + 4);
 #endif
 #ifdef INTRO_SIGNALTYPE
-  MAX7456_WriteString_P(PGMSTR(&(signal_type[flags.signalauto])), 64 + (30 * 7) + 4);
+  OSD_WriteString_P(PGMSTR(&(signal_type[flags.signalauto])), 64 + (30 * 7) + 4);
 #endif
 #ifdef INTRO_FC
   itoa(FC.verMajor, screenBuffer, 10);
@@ -876,12 +876,12 @@ void displayIntro(void)
   screenBuffer[xx] = 0x2E;
   xx++;
   itoa(FC.verMinor, screenBuffer + xx, 10);
-  MAX7456_WriteString(screenBuffer, 64 + (30 * 8) + 4);
+  OSD_WriteString(screenBuffer, 64 + (30 * 8) + 4);
 
 #endif
 #ifdef HAS_ALARMS
   if (alarmState != ALARM_OK) {
-    MAX7456_WriteString((const char*)alarmMsg, 64 + (30 * 9) + 4);
+    OSD_WriteString((const char*)alarmMsg, 64 + (30 * 9) + 4);
   }
 #endif
 }
@@ -934,7 +934,7 @@ void displayNumberOfSat(void)
   screenBuffer[0] = SYM_SAT_L;
   screenBuffer[1] = SYM_SAT_R;
   itoa(GPS_numSat, screenBuffer + 2, 10);
-  MAX7456_WriteString(screenBuffer, getPosition(GPS_numSatPosition));
+  OSD_WriteString(screenBuffer, getPosition(GPS_numSatPosition));
 #else
   displayItem(GPS_numSatPosition, GPS_numSat, SYM_SAT, 0 , 0 );
 #endif
@@ -1107,7 +1107,7 @@ void displayDistanceToHome(void)
 
   //  formatDistance(dist,1,2,0);
   formatDistance(dist, 1, 2, SYM_DTH);
-  MAX7456_WriteString(screenBuffer, getPosition(GPS_distanceToHomePosition));
+  OSD_WriteString(screenBuffer, getPosition(GPS_distanceToHomePosition));
 }
 
 
@@ -1117,7 +1117,7 @@ void displayDistanceTotal(void)
   if (!fieldIsVisible(TotalDistanceposition))
     return;
   formatDistance(trip, 1, 2, SYM_TOTAL);
-  MAX7456_WriteString(screenBuffer, getPosition(TotalDistanceposition));
+  OSD_WriteString(screenBuffer, getPosition(TotalDistanceposition));
 #endif //SHOW_TOTAL_DISTANCE
 }
 
@@ -1128,7 +1128,7 @@ void displayDistanceMax(void)
   if (!fieldIsVisible(MaxDistanceposition))
     return;
   formatDistance(distanceMAX, 1, 2, SYM_MAX);
-  MAX7456_WriteString(screenBuffer, getPosition(MaxDistanceposition));
+  OSD_WriteString(screenBuffer, getPosition(MaxDistanceposition));
 #endif //SHOW_MAX_DISTANCE
 }
 
@@ -1162,7 +1162,7 @@ void displayHeading(void)
       screenBuffer[4]=SYM_DEGREES;
       screenBuffer[5]=0;
     }
-    MAX7456_WriteString(screenBuffer,getPosition(MwHeadingPosition));
+    OSD_WriteString(screenBuffer,getPosition(MwHeadingPosition));
   */
   int16_t heading = MwHeading;
   if (heading < 0)
@@ -1181,7 +1181,7 @@ void displayAngleToHome(void)
       ItoaPadded(GPS_directionToHome,screenBuffer,3,0);
       screenBuffer[3] = SYM_DEGREES;
       screenBuffer[4] = 0;
-      MAX7456_WriteString(screenBuffer,getPosition(GPS_angleToHomePosition));
+      OSD_WriteString(screenBuffer,getPosition(GPS_angleToHomePosition));
   */
   displayItem(GPS_angleToHomePosition, GPS_directionToHome, SYM_ANGLE_RTH, SYM_DEGREES, 0 );
 
@@ -1201,7 +1201,7 @@ void displayDirectionToHome(void)
   d = (d / 90) % 16;
   screenBuffer[0] = SYM_ARROW_HOME + d;
   screenBuffer[1] = 0;
-  MAX7456_WriteString(screenBuffer, position);
+  OSD_WriteString(screenBuffer, position);
 }
 
 
@@ -1234,7 +1234,7 @@ void displayWindSpeed(void)
   d = (d / 90) % 16;
   screenBuffer[0] = SYM_ARROW_DIR + d;
   screenBuffer[1] = 0;
-  MAX7456_WriteString(screenBuffer, getPosition(WIND_speedPosition));
+  OSD_WriteString(screenBuffer, getPosition(WIND_speedPosition));
 #endif
 }
 
@@ -1555,21 +1555,21 @@ void displayConfigScreen(void)
   }
 #endif // MENU_KISS
 
-  MAX7456_WriteString_P(PGMSTR(&(menutitle_item[configPage])), 35);
+  OSD_WriteString_P(PGMSTR(&(menutitle_item[configPage])), 35);
 #ifdef MENU_PROFILE
-  //   MAX7456_WriteString(itoa(FCProfile,screenBuffer,10),50); // Display Profile number
+  //   OSD_WriteString(itoa(FCProfile,screenBuffer,10),50); // Display Profile number
 #endif
-  MAX7456_WriteString_P(configMsgEXT, SAVEP);    //EXIT
+  OSD_WriteString_P(configMsgEXT, SAVEP);    //EXIT
   if (!previousarmedstatus) {
-    MAX7456_WriteString_P(configMsgSAVE, SAVEP + 6); //SaveExit
-    MAX7456_WriteString_P(configMsgPGS, SAVEP + 16); //<Page>
+    OSD_WriteString_P(configMsgSAVE, SAVEP + 6); //SaveExit
+    OSD_WriteString_P(configMsgPGS, SAVEP + 16); //<Page>
   }
 
   if (configPage == MENU_STAT)
   {
 
 #ifdef SHORTSUMMARY
-    MAX7456_WriteString_P(PGMSTR(&(menu_stats_item[0])), ROLLT);
+    OSD_WriteString_P(PGMSTR(&(menu_stats_item[0])), ROLLT);
     displayTimer(flyingTime, ROLLD - 3, 0);
 #else // SHORTSUMMARY
 
@@ -1600,17 +1600,17 @@ void displayConfigScreen(void)
       Y++;
 #endif
 
-      MAX7456_WriteString_P(PGMSTR(&(menu_stats_item[X])), ROLLT + (Y * 30));
+      OSD_WriteString_P(PGMSTR(&(menu_stats_item[X])), ROLLT + (Y * 30));
       if (( X == 6) | ( X == 7))  {
         ItoaPadded(MaxMenuBuffer[X], screenBuffer, 4, 3);
-        MAX7456_WriteString(screenBuffer, 110 + (30 * Y));
+        OSD_WriteString(screenBuffer, 110 + (30 * Y));
       }
       else  {
 #ifdef LONG_RANGE_DISPLAY
         formatDistance(MaxMenuBuffer[X], 0, 2, 0);
-        MAX7456_WriteString(screenBuffer, 110 + (30 * Y));
+        OSD_WriteString(screenBuffer, 110 + (30 * Y));
 #else
-        MAX7456_WriteString(itoa(MaxMenuBuffer[X], screenBuffer, 10), 110 + (30 * Y));
+        OSD_WriteString(itoa(MaxMenuBuffer[X], screenBuffer, 10), 110 + (30 * Y));
 #endif
       }
     }
@@ -1619,7 +1619,7 @@ void displayConfigScreen(void)
 #endif
 #ifdef HAS_ALARMS
     if (alarmState != ALARM_OK) {
-      MAX7456_WriteString((const char*)alarmMsg, LINE12 + 3);
+      OSD_WriteString((const char*)alarmMsg, LINE12 + 3);
     }
 #endif
 
@@ -1635,9 +1635,9 @@ void displayConfigScreen(void)
 #endif
     {
 #ifdef USE_MSP_PIDNAMES
-      MAX7456_WriteString(menu_pid[X], ROLLT + (X * 30));
+      OSD_WriteString(menu_pid[X], ROLLT + (X * 30));
 #else
-      MAX7456_WriteString_P(PGMSTR(&(menu_pid[X])), ROLLT + (X * 30));
+      OSD_WriteString_P(PGMSTR(&(menu_pid[X])), ROLLT + (X * 30));
 #endif
     }
 
@@ -1652,14 +1652,14 @@ void displayConfigScreen(void)
       if (Y > 6) {
         X = X - 2;
       }
-      MAX7456_WriteString(itoa(pidP[Y], screenBuffer, 10), ROLLP + (X * 30));
-      MAX7456_WriteString(itoa(pidI[Y], screenBuffer, 10), ROLLI + (X * 30));
-      MAX7456_WriteString(itoa(pidD[Y], screenBuffer, 10), ROLLD + (X * 30));
+      OSD_WriteString(itoa(pidP[Y], screenBuffer, 10), ROLLP + (X * 30));
+      OSD_WriteString(itoa(pidI[Y], screenBuffer, 10), ROLLI + (X * 30));
+      OSD_WriteString(itoa(pidD[Y], screenBuffer, 10), ROLLD + (X * 30));
     }
 
-    MAX7456_WriteString("P", 71);
-    MAX7456_WriteString("I", 77);
-    MAX7456_WriteString("D", 83);
+    OSD_WriteString("P", 71);
+    OSD_WriteString("I", 77);
+    OSD_WriteString("D", 83);
   }
 #endif
 #ifdef MENU_2RC
@@ -1668,8 +1668,8 @@ void displayConfigScreen(void)
     MenuBuffer[0] = tpa_breakpoint16;
     MenuBuffer[1] = rcYawExpo8;
     for (uint8_t X = 0; X <= 1; X++) {
-      MAX7456_WriteString_P(PGMSTR(&(menu_rc_2[X])), ROLLT + (X * 30));
-      MAX7456_WriteString(itoa(MenuBuffer[X], screenBuffer, 10), 113 + (30 * X));
+      OSD_WriteString_P(PGMSTR(&(menu_rc_2[X])), ROLLT + (X * 30));
+      OSD_WriteString(itoa(MenuBuffer[X], screenBuffer, 10), 113 + (30 * X));
     }
   }
 #endif
@@ -1686,8 +1686,8 @@ void displayConfigScreen(void)
     MenuBuffer[6] = thrMid8;
     MenuBuffer[7] = thrExpo8;
     for (uint8_t X = 0; X <= 7; X++) {
-      MAX7456_WriteString_P(PGMSTR(&(menu_rc[X])), ROLLT + (X * 30));
-      MAX7456_WriteString(itoa(MenuBuffer[X], screenBuffer, 10), 113 + (30 * X));
+      OSD_WriteString_P(PGMSTR(&(menu_rc[X])), ROLLT + (X * 30));
+      OSD_WriteString(itoa(MenuBuffer[X], screenBuffer, 10), 113 + (30 * X));
     }
 #elif defined CORRECT_MENU_RCT1
     MenuBuffer[0] = rcRate8;
@@ -1699,8 +1699,8 @@ void displayConfigScreen(void)
     MenuBuffer[6] = thrMid8;
     MenuBuffer[7] = thrExpo8;
     for (uint8_t X = 0; X <= 7; X++) {
-      MAX7456_WriteString_P(PGMSTR(&(menu_rc[X])), ROLLT + (X * 30));
-      MAX7456_WriteString(itoa(MenuBuffer[X], screenBuffer, 10), 113 + (30 * X));
+      OSD_WriteString_P(PGMSTR(&(menu_rc[X])), ROLLT + (X * 30));
+      OSD_WriteString(itoa(MenuBuffer[X], screenBuffer, 10), 113 + (30 * X));
     }
 #else
     MenuBuffer[0] = rcRate8;
@@ -1711,8 +1711,8 @@ void displayConfigScreen(void)
     MenuBuffer[5] = thrMid8;
     MenuBuffer[6] = thrExpo8;
     for (uint8_t X = 0; X <= 6; X++) {
-      MAX7456_WriteString_P(PGMSTR(&(menu_rc[X])), ROLLT + (X * 30));
-      MAX7456_WriteString(itoa(MenuBuffer[X], screenBuffer, 10), 113 + (30 * X));
+      OSD_WriteString_P(PGMSTR(&(menu_rc[X])), ROLLT + (X * 30));
+      OSD_WriteString(itoa(MenuBuffer[X], screenBuffer, 10), 113 + (30 * X));
     }
 #endif
   }
@@ -1720,13 +1720,13 @@ void displayConfigScreen(void)
 #ifdef MENU_SERVO
   if (configPage == MENU_SERVO)
   {
-    MAX7456_WriteString("MIN", 67);
-    MAX7456_WriteString("MAX", 67 + 7);
-    MAX7456_WriteString("MID", 67 + 7 + 7);
+    OSD_WriteString("MIN", 67);
+    OSD_WriteString("MAX", 67 + 7);
+    OSD_WriteString("MID", 67 + 7 + 7);
     for (uint8_t X = 0; X < 8; X++) {
-      MAX7456_WriteString_P(PGMSTR(&(menu_servo[X])), 93 + (X * 30));
+      OSD_WriteString_P(PGMSTR(&(menu_servo[X])), 93 + (X * 30));
       for (uint8_t YY = 0; YY < 3; YY++) {
-        MAX7456_WriteString(itoa(servo.settings[YY][X], screenBuffer, 10), 97 + (X * 30) + (YY * 7));
+        OSD_WriteString(itoa(servo.settings[YY][X], screenBuffer, 10), 97 + (X * 30) + (YY * 7));
       }
     }
   }
@@ -1743,8 +1743,8 @@ void displayConfigScreen(void)
     MenuBuffer[6] = cfg.fw_idle_throttle;
     MenuBuffer[7] = cfg.fw_rth_alt;
     for (uint8_t X = 0; X <= 7; X++) {
-      MAX7456_WriteString_P(PGMSTR(&(menu_fixedwing_bf[X])), ROLLT + (X * 30));
-      MAX7456_WriteString(itoa(MenuBuffer[X], screenBuffer, 10), 113 + (30 * X));
+      OSD_WriteString_P(PGMSTR(&(menu_fixedwing_bf[X])), ROLLT + (X * 30));
+      OSD_WriteString(itoa(MenuBuffer[X], screenBuffer, 10), 113 + (30 * X));
     }
   }
 #endif
@@ -1756,21 +1756,21 @@ void displayConfigScreen(void)
     ItoaPadded(voltage, screenBuffer + 1, 4, 3);
     screenBuffer[5] = SYM_VOLT;
     screenBuffer[6] = 0;
-    MAX7456_WriteString(screenBuffer, ROLLD - LINE - LINE - 1);
+    OSD_WriteString(screenBuffer, ROLLD - LINE - LINE - 1);
 
     screenBuffer[0] = SYM_VID_BAT;
     ItoaPadded(vidvoltage, screenBuffer + 1, 4, 3);
     screenBuffer[5] = SYM_VOLT;
     screenBuffer[6] = 0;
-    MAX7456_WriteString(screenBuffer, ROLLI - LINE - LINE - 3);
+    OSD_WriteString(screenBuffer, ROLLI - LINE - LINE - 3);
 
     for (uint8_t X = 0; X <= 3; X++) {
-      MAX7456_WriteString_P(PGMSTR(&(menu_bat[X])), ROLLT + (X * 30));
+      OSD_WriteString_P(PGMSTR(&(menu_bat[X])), ROLLT + (X * 30));
     }
-    MAX7456_WriteString(itoa(Settings[S_VOLTAGEMIN], screenBuffer, 10), ROLLD);
-    MAX7456_WriteString(itoa(Settings[S_DIVIDERRATIO], screenBuffer, 10), PITCHD);
-    MAX7456_WriteString(itoa(Settings[S_VIDDIVIDERRATIO], screenBuffer, 10), YAWD);
-    MAX7456_WriteString(itoa(Settings[S_BATCELLS], screenBuffer, 10), ALTD);
+    OSD_WriteString(itoa(Settings[S_VOLTAGEMIN], screenBuffer, 10), ROLLD);
+    OSD_WriteString(itoa(Settings[S_DIVIDERRATIO], screenBuffer, 10), PITCHD);
+    OSD_WriteString(itoa(Settings[S_VIDDIVIDERRATIO], screenBuffer, 10), YAWD);
+    OSD_WriteString(itoa(Settings[S_BATCELLS], screenBuffer, 10), ALTD);
   }
 #endif
 #ifdef MENU_RSSI
@@ -1780,18 +1780,18 @@ void displayConfigScreen(void)
     uint8_t xx = FindNull();
     screenBuffer[xx++] = '%';
     screenBuffer[xx] = 0;
-    MAX7456_WriteString(screenBuffer, ROLLD - LINE - LINE);
+    OSD_WriteString(screenBuffer, ROLLD - LINE - LINE);
     for (uint8_t X = 0; X <= 2; X++) {
-      MAX7456_WriteString_P(PGMSTR(&(menu_rssi[X])), ROLLT + (X * 30));
+      OSD_WriteString_P(PGMSTR(&(menu_rssi[X])), ROLLT + (X * 30));
     }
     if (timer.rssiTimer > 0) {
-      MAX7456_WriteString(itoa(timer.rssiTimer, screenBuffer, 10), ROLLD);
+      OSD_WriteString(itoa(timer.rssiTimer, screenBuffer, 10), ROLLD);
     }
     else {
-      MAX7456_WriteString("-", ROLLD);
+      OSD_WriteString("-", ROLLD);
     }
-    MAX7456_WriteString(itoa(Settings16[S16_RSSIMAX], screenBuffer, 10), PITCHD);
-    MAX7456_WriteString(itoa(Settings16[S16_RSSIMIN], screenBuffer, 10), YAWD);
+    OSD_WriteString(itoa(Settings16[S16_RSSIMAX], screenBuffer, 10), PITCHD);
+    OSD_WriteString(itoa(Settings16[S16_RSSIMIN], screenBuffer, 10), YAWD);
   }
 #endif
 #ifdef MENU_CURRENT
@@ -1800,35 +1800,35 @@ void displayConfigScreen(void)
     ItoaPadded(amperage, screenBuffer, 4, 3);     // 99.9 ampere max!
     screenBuffer[4] = SYM_AMP;
     screenBuffer[5] = 0;
-    MAX7456_WriteString(screenBuffer, ROLLD - LINE - LINE - 1);
+    OSD_WriteString(screenBuffer, ROLLD - LINE - LINE - 1);
 
     for (uint8_t X = 0; X <= 1; X++) {
-      MAX7456_WriteString_P(PGMSTR(&(menu_amps[X])), ROLLT + (X * 30));
+      OSD_WriteString_P(PGMSTR(&(menu_amps[X])), ROLLT + (X * 30));
     }
-    MAX7456_WriteString(itoa(Settings16[S16_AMPDIVIDERRATIO], screenBuffer, 10), ROLLD);
-    MAX7456_WriteString(itoa(Settings16[S16_AMPZERO], screenBuffer, 10), PITCHD);
+    OSD_WriteString(itoa(Settings16[S16_AMPDIVIDERRATIO], screenBuffer, 10), ROLLD);
+    OSD_WriteString(itoa(Settings16[S16_AMPZERO], screenBuffer, 10), PITCHD);
   }
 #endif
 #ifdef MENU_DISPLAY
   if (configPage == MENU_DISPLAY)
   {
     for (uint8_t X = 0; X <= 0; X++) {
-      MAX7456_WriteString_P(PGMSTR(&(menu_display[X])), ROLLT + (X * 30));
+      OSD_WriteString_P(PGMSTR(&(menu_display[X])), ROLLT + (X * 30));
     }
-    MAX7456_WriteString(itoa(Settings[S_MAPMODE], screenBuffer, 10), ROLLD);
+    OSD_WriteString(itoa(Settings[S_MAPMODE], screenBuffer, 10), ROLLD);
   }
 #endif
 #ifdef MENU_ADVANCED
   if (configPage == MENU_ADVANCED)
   {
     for (uint8_t X = 0; X <= 1; X++) {
-      MAX7456_WriteString_P(PGMSTR(&(menu_advanced[X])), ROLLT + (X * 30));
+      OSD_WriteString_P(PGMSTR(&(menu_advanced[X])), ROLLT + (X * 30));
     }
 
     if (timer.magCalibrationTimer > 0)
-      MAX7456_WriteString(itoa(timer.magCalibrationTimer, screenBuffer, 10), ROLLD);
+      OSD_WriteString(itoa(timer.magCalibrationTimer, screenBuffer, 10), ROLLD);
     else
-      MAX7456_WriteString("-", ROLLD);
+      OSD_WriteString("-", ROLLD);
     Menuconfig_onoff(PITCHD, S_THROTTLE_PWM);
   }
 #endif
@@ -1836,11 +1836,11 @@ void displayConfigScreen(void)
   if (configPage == MENU_GPS_TIME)
   {
     for (uint8_t X = 0; X <= 2; X++) {
-      MAX7456_WriteString_P(PGMSTR(&(menu_gps_time[X])), ROLLT + (X * 30));
+      OSD_WriteString_P(PGMSTR(&(menu_gps_time[X])), ROLLT + (X * 30));
     }
     Menuconfig_onoff(ROLLD, S_GPSTIME);
     Menuconfig_onoff(PITCHD, S_GPSTZAHEAD);
-    MAX7456_WriteString(itoa(Settings[S_GPSTZ], screenBuffer, 10), YAWD);
+    OSD_WriteString(itoa(Settings[S_GPSTZ], screenBuffer, 10), YAWD);
   }
 #endif
 #ifdef MENU_ALARMS
@@ -1852,9 +1852,9 @@ void displayConfigScreen(void)
     MenuBuffer[4] = Settings[S_AMPER_HOUR_ALARM];
     MenuBuffer[5] = Settings[S_AMPERAGE_ALARM];
     for (uint8_t X = 0; X <= 6; X++) {
-      MAX7456_WriteString_P(PGMSTR(&(menu_alarm_item[X])), ROLLT + (X * 30));
+      OSD_WriteString_P(PGMSTR(&(menu_alarm_item[X])), ROLLT + (X * 30));
       if (X <= 5)
-        MAX7456_WriteString(itoa(MenuBuffer[X], screenBuffer, 10), 113 + (30 * X));
+        OSD_WriteString(itoa(MenuBuffer[X], screenBuffer, 10), 113 + (30 * X));
     }
     Menuconfig_onoff(MAGD, S_ALARMS_TEXT);
   }
@@ -1873,8 +1873,8 @@ void displayConfigScreen(void)
     MenuBuffer[1] = PIDController;
     MenuBuffer[2] = LoopTime;
     for (uint8_t X = 0; X <= MENU10MAX; X++) {
-      MAX7456_WriteString_P(PGMSTR(&(menu_profile[X])), ROLLT + (X * 30));
-      MAX7456_WriteString(itoa(MenuBuffer[X], screenBuffer, 10), 113 + (30 * X));
+      OSD_WriteString_P(PGMSTR(&(menu_profile[X])), ROLLT + (X * 30));
+      OSD_WriteString(itoa(MenuBuffer[X], screenBuffer, 10), 113 + (30 * X));
     }
   }
 #endif
@@ -1882,7 +1882,7 @@ void displayConfigScreen(void)
 #ifdef MENU_INFO
   if (configPage == MENU_INFO) {
     for (uint8_t X = 0; X <= 4; X++) {
-      MAX7456_WriteString_P(PGMSTR(&(menu_info[X])), ROLLT + (X * 30));
+      OSD_WriteString_P(PGMSTR(&(menu_info[X])), ROLLT + (X * 30));
     }
   }
 #endif
@@ -1891,15 +1891,15 @@ void displayConfigScreen(void)
   if (configPage == MENU_VTX) {
 
     for (uint8_t X = 0; X <= 2; X++)
-      MAX7456_WriteString_P(PGMSTR(&(menu_vtx[X])), ROLLT + (X * 30));
+      OSD_WriteString_P(PGMSTR(&(menu_vtx[X])), ROLLT + (X * 30));
     // Power
-    MAX7456_WriteString_P(PGMSTR(&(vtxPowerNames[Settings[S_VTX_POWER]])) , ROLLI);
+    OSD_WriteString_P(PGMSTR(&(vtxPowerNames[Settings[S_VTX_POWER]])) , ROLLI);
     // Band
-    MAX7456_WriteString_P(PGMSTR(&(vtxBandNames[Settings[S_VTX_BAND]])) , PITCHI);
+    OSD_WriteString_P(PGMSTR(&(vtxBandNames[Settings[S_VTX_BAND]])) , PITCHI);
     // Channel
-    MAX7456_WriteString(itoa(Settings[S_VTX_CHANNEL] + 1, screenBuffer, 10), YAWI);
+    OSD_WriteString(itoa(Settings[S_VTX_CHANNEL] + 1, screenBuffer, 10), YAWI);
     // Set
-    MAX7456_WriteString("SET", ALTI);
+    OSD_WriteString("SET", ALTI);
 
 #ifdef DISPLAY_VTX_INFO
     updateVtxStatus();
@@ -1926,10 +1926,10 @@ void updateVtxStatus(void)
     char tmp[2];
     tmp[0] = (char)pgm_read_byte(&vtxBandLetters[vtxBand]);
     tmp[1] = 0;
-    MAX7456_WriteString(tmp, 12 + 30);
-    MAX7456_WriteString(itoa(vtxChannel + 1, screenBuffer, 10), 14 + 30);
-    MAX7456_WriteString_P(PGMSTR(&(vtxPowerNames[vtxPower])), 16 + 30);
-    MAX7456_WriteString(itoa((uint16_t)pgm_read_word(&vtx_frequencies[vtxBand][vtxChannel]), screenBuffer, 10), 20 + 30);
+    OSD_WriteString(tmp, 12 + 30);
+    OSD_WriteString(itoa(vtxChannel + 1, screenBuffer, 10), 14 + 30);
+    OSD_WriteString_P(PGMSTR(&(vtxPowerNames[vtxPower])), 16 + 30);
+    OSD_WriteString(itoa((uint16_t)pgm_read_word(&vtx_frequencies[vtxBand][vtxChannel]), screenBuffer, 10), 20 + 30);
   }
 }
 #endif
@@ -1937,23 +1937,23 @@ void updateVtxStatus(void)
 #ifdef MENU_KISS
 void displaySubMenuConfig(void) {
   if (configPage == MENU_KISS) {
-    MAX7456_WriteString_P(PGMSTR(&(menutitle_item[configPage])), 38);
+    OSD_WriteString_P(PGMSTR(&(menutitle_item[configPage])), 38);
     if (subConfigPage < 0) {
-      MAX7456_WriteString_P(configMsgEXT, SAVEP);    //EXIT
+      OSD_WriteString_P(configMsgEXT, SAVEP);    //EXIT
       if (!previousarmedstatus) {
-        MAX7456_WriteString_P(configMsgSAVE, SAVEP + 6); //SaveExit
-        MAX7456_WriteString_P(configMsgPGS, SAVEP + 16); //<Page>
+        OSD_WriteString_P(configMsgSAVE, SAVEP + 6); //SaveExit
+        OSD_WriteString_P(configMsgPGS, SAVEP + 16); //<Page>
       }
     } else {
-      MAX7456_WriteString_P(configMsgBack, SAVEP);    //BACK
-      MAX7456_WriteString_P(configMsgSAVEAndBack, SAVEP + 16); //Save+Back
+      OSD_WriteString_P(configMsgBack, SAVEP);    //BACK
+      OSD_WriteString_P(configMsgSAVEAndBack, SAVEP + 16); //Save+Back
     }
     switch (subConfigPage)
     {
     case SUBMENU_KISS_PID:
       for (uint8_t X = 0; X < PIDITEMS; X++)
       {
-        MAX7456_WriteString_P(PGMSTR(&(menu_pid[X])), ROLLT + (X * 60));
+        OSD_WriteString_P(PGMSTR(&(menu_pid[X])), ROLLT + (X * 60));
 	    }
       for (uint8_t Y = 0; Y < PIDITEMS; Y++)
       {
@@ -1963,22 +1963,22 @@ void displaySubMenuConfig(void) {
          X = X - 2;
         }
         ItoaPadded(pidP[Y], screenBuffer, 5,3);
-        MAX7456_WriteString(screenBuffer, ROLLP + (X * 60)-3);
+        OSD_WriteString(screenBuffer, ROLLP + (X * 60)-3);
         ItoaPadded(pidI[Y], screenBuffer, 6,3);
-        MAX7456_WriteString(screenBuffer, ROLLI + (X * 60)-3);
+        OSD_WriteString(screenBuffer, ROLLI + (X * 60)-3);
         ItoaPadded(pidD[Y], screenBuffer, 5,3);
-        MAX7456_WriteString(screenBuffer, ROLLD + (X * 60)-2);
+        OSD_WriteString(screenBuffer, ROLLD + (X * 60)-2);
       }
 
-      MAX7456_WriteString("P", 71);
-      MAX7456_WriteString("I", 77);
-      MAX7456_WriteString("D", 83);
+      OSD_WriteString("P", 71);
+      OSD_WriteString("I", 77);
+      OSD_WriteString("D", 83);
       break;
     case SUBMENU_KISS_RATE:
       // The rows of rates correspond to the pid
       for (uint8_t X = 0; X < PIDITEMS; X++)
       {
-        MAX7456_WriteString_P(PGMSTR(&(menu_pid[X])), ROLLT + (X * 60));
+        OSD_WriteString_P(PGMSTR(&(menu_pid[X])), ROLLT + (X * 60));
       }
       for (uint8_t Y = 0; Y < PIDITEMS; Y++)
       {
@@ -1989,53 +1989,53 @@ void displaySubMenuConfig(void) {
         }
 
         ItoaPadded(rateRC[Y], screenBuffer, 5,3);
-        MAX7456_WriteString(screenBuffer, ROLLRC + (X * 60)-3);
+        OSD_WriteString(screenBuffer, ROLLRC + (X * 60)-3);
         ItoaPadded(rateRate[Y], screenBuffer, 5,3);
-        MAX7456_WriteString(screenBuffer, ROLLRATE + (X * 60)-3);
+        OSD_WriteString(screenBuffer, ROLLRATE + (X * 60)-3);
         ItoaPadded(rateCurve[Y], screenBuffer, 5,3);
-        MAX7456_WriteString(screenBuffer, ROLLCURVE + (X * 60)-2);
+        OSD_WriteString(screenBuffer, ROLLCURVE + (X * 60)-2);
       }
 
-      MAX7456_WriteString_P(menu_kiss_rates[0], 69);
-      MAX7456_WriteString_P(menu_kiss_rates[1], 75);
-      MAX7456_WriteString_P(menu_kiss_rates[2], 82);
+      OSD_WriteString_P(menu_kiss_rates[0], 69);
+      OSD_WriteString_P(menu_kiss_rates[1], 75);
+      OSD_WriteString_P(menu_kiss_rates[2], 82);
       break;
     case SUBMENU_KISS_NOTCH_FILTERS:
-      MAX7456_WriteString_P(PGMSTR(&(menu_kiss_notch_filters[0])), 68);
-      MAX7456_WriteString_P(PGMSTR(&(menu_kiss_notch_filters[1])), 75);
-      MAX7456_WriteString_P(PGMSTR(&(menu_kiss_notch_filters[2])), 82);
+      OSD_WriteString_P(PGMSTR(&(menu_kiss_notch_filters[0])), 68);
+      OSD_WriteString_P(PGMSTR(&(menu_kiss_notch_filters[1])), 75);
+      OSD_WriteString_P(PGMSTR(&(menu_kiss_notch_filters[2])), 82);
       // ROLL
-      MAX7456_WriteString_P(PGMSTR(&(menu_kiss_notch_filters[3])), 92);
-      MAX7456_WriteString_P(PGMSTR(&(menu_on_off[nfRollEnable])), 92 + 7);
-      MAX7456_WriteString(itoa(nfRollCenter, screenBuffer, 10), 92 + 14);
-      MAX7456_WriteString(itoa(nfRollCutoff, screenBuffer, 10), 92 + 21);
+      OSD_WriteString_P(PGMSTR(&(menu_kiss_notch_filters[3])), 92);
+      OSD_WriteString_P(PGMSTR(&(menu_on_off[nfRollEnable])), 92 + 7);
+      OSD_WriteString(itoa(nfRollCenter, screenBuffer, 10), 92 + 14);
+      OSD_WriteString(itoa(nfRollCutoff, screenBuffer, 10), 92 + 21);
       // PITCH
-      MAX7456_WriteString_P(PGMSTR(&(menu_kiss_notch_filters[4])), 122);
-      MAX7456_WriteString_P(PGMSTR(&(menu_on_off[nfPitchEnable])), 122 + 7);
-      MAX7456_WriteString(itoa(nfPitchCenter, screenBuffer, 10), 122 + 14);
-      MAX7456_WriteString(itoa(nfPitchCutoff, screenBuffer, 10), 122 + 21);
+      OSD_WriteString_P(PGMSTR(&(menu_kiss_notch_filters[4])), 122);
+      OSD_WriteString_P(PGMSTR(&(menu_on_off[nfPitchEnable])), 122 + 7);
+      OSD_WriteString(itoa(nfPitchCenter, screenBuffer, 10), 122 + 14);
+      OSD_WriteString(itoa(nfPitchCutoff, screenBuffer, 10), 122 + 21);
 
       break;
     case SUBMENU_KISS_LPF:
       for (uint8_t Y = 0; Y < 4; Y++) {
-        MAX7456_WriteString_P(PGMSTR(&(menu_kiss_lpf[Y])), (Y + 3) * 30 + 2);
+        OSD_WriteString_P(PGMSTR(&(menu_kiss_lpf[Y])), (Y + 3) * 30 + 2);
       }
       
-      MAX7456_WriteString(itoa(yawCFilter, screenBuffer, 10), 90 + 19);
-      MAX7456_WriteString_P(PGMSTR(&(menu_kiss_lpf[rpLPF + 4])), 120 + 19);
-      MAX7456_WriteString_P(PGMSTR(&(menu_kiss_lpf[yawLPF + 4])), 150 + 19);
-      MAX7456_WriteString_P(PGMSTR(&(menu_kiss_lpf[dtermLPF + 4])), 180 + 19);
+      OSD_WriteString(itoa(yawCFilter, screenBuffer, 10), 90 + 19);
+      OSD_WriteString_P(PGMSTR(&(menu_kiss_lpf[rpLPF + 4])), 120 + 19);
+      OSD_WriteString_P(PGMSTR(&(menu_kiss_lpf[yawLPF + 4])), 150 + 19);
+      OSD_WriteString_P(PGMSTR(&(menu_kiss_lpf[dtermLPF + 4])), 180 + 19);
       break;
     case SUBMENU_KISS_VTX:
       for (uint8_t Y = 0; Y < 5; Y++) {
-        MAX7456_WriteString_P(PGMSTR(&(menu_kiss_vtx[Y])), (Y + 3) * 30 + 2);
+        OSD_WriteString_P(PGMSTR(&(menu_kiss_vtx[Y])), (Y + 3) * 30 + 2);
       }
       
-      MAX7456_WriteString_P(PGMSTR(&(menu_kiss_vtx_type[vtxType])), 90 + 13);
-      MAX7456_WriteString(itoa(vtxLowPower, screenBuffer, 10), 120 + 13);
-      MAX7456_WriteString(itoa(vtxMaxPower, screenBuffer, 10), 150 + 13);
-      MAX7456_WriteString_P(PGMSTR(&(vtxBandLetters[vtxBand])), 180 + 13);
-      MAX7456_WriteString(itoa(vtxChannel, screenBuffer, 10), 210 + 13);
+      OSD_WriteString_P(PGMSTR(&(menu_kiss_vtx_type[vtxType])), 90 + 13);
+      OSD_WriteString(itoa(vtxLowPower, screenBuffer, 10), 120 + 13);
+      OSD_WriteString(itoa(vtxMaxPower, screenBuffer, 10), 150 + 13);
+      OSD_WriteString_P(PGMSTR(&(vtxBandLetters[vtxBand])), 180 + 13);
+      OSD_WriteString(itoa(vtxChannel, screenBuffer, 10), 210 + 13);
       break;
     default:
       for (uint8_t subMenu = 0; subMenu < SUBMENU_KISS_SIZE; subMenu++) {
@@ -2069,87 +2069,87 @@ void displayDebug(void)
 #endif //(DEBUG)||defined (DEBUGMW)||defined (FORCEDEBUG)
 
 #ifdef DEBUGDPOSMENU
-  MAX7456_WriteString("DEBUGGING INFORMATION", DEBUGDPOSMENU);
+  OSD_WriteString("DEBUGGING INFORMATION", DEBUGDPOSMENU);
 #endif
 #ifdef DEBUGDPOSRCDATA
-  MAX7456_WriteString("RC", DEBUGDPOSRCDATA);
+  OSD_WriteString("RC", DEBUGDPOSRCDATA);
   for (uint8_t X = 1; X <= 8; X++) {
     itoa(MwRcData[X], screenBuffer, 10);
-    MAX7456_WriteString(screenBuffer, DEBUGDPOSRCDATA + (X * LINE));
+    OSD_WriteString(screenBuffer, DEBUGDPOSRCDATA + (X * LINE));
   }
 #endif
 #ifdef DEBUGDPOSANAL
-  MAX7456_WriteString("ANAL", DEBUGDPOSANAL - 30);
+  OSD_WriteString("ANAL", DEBUGDPOSANAL - 30);
   for (uint8_t sensor = 0; sensor < SENSORTOTAL; sensor++) {
     itoa(sensorfilter[sensor][SENSORFILTERSIZE], screenBuffer, 10);
-    MAX7456_WriteString(screenBuffer, DEBUGDPOSANAL + (sensor * LINE));
+    OSD_WriteString(screenBuffer, DEBUGDPOSANAL + (sensor * LINE));
   }
 #endif
 #ifdef DEBUGDPOSVAL
-  //  MAX7456_WriteString("DEBUG",DEBUGDPOSVAL-30);
+  //  OSD_WriteString("DEBUG",DEBUGDPOSVAL-30);
   for (uint8_t X = 0; X < 4; X++) {
     ItoaPadded(debug[X], screenBuffer + 2, 7, 0);
     screenBuffer[0] = 0x44;
     screenBuffer[1] = 0x30 + X;
     screenBuffer[2] = 0X3A;
-    MAX7456_WriteString(screenBuffer, DEBUGDPOSVAL + (X * LINE));
+    OSD_WriteString(screenBuffer, DEBUGDPOSVAL + (X * LINE));
   }
 #endif
 #ifdef DEBUGDPOSPWM
-  MAX7456_WriteString("PWM", DEBUGDPOSPWM);
+  OSD_WriteString("PWM", DEBUGDPOSPWM);
   itoa(pwmval1, screenBuffer, 10);
-  MAX7456_WriteString(screenBuffer, DEBUGDPOSPWM + (1 * LINE));
+  OSD_WriteString(screenBuffer, DEBUGDPOSPWM + (1 * LINE));
   itoa(pwmval2, screenBuffer, 10);
-  MAX7456_WriteString(screenBuffer, DEBUGDPOSPWM + (2 * LINE));
+  OSD_WriteString(screenBuffer, DEBUGDPOSPWM + (2 * LINE));
 #endif
 #ifdef DEBUGDPOSLOOP
-  MAX7456_WriteString("LOOP", DEBUGDPOSLOOP);
+  OSD_WriteString("LOOP", DEBUGDPOSLOOP);
   itoa(framerate, screenBuffer, 10);
-  MAX7456_WriteString(screenBuffer, DEBUGDPOSLOOP + 5);
+  OSD_WriteString(screenBuffer, DEBUGDPOSLOOP + 5);
 #endif
 #ifdef DEBUGDPOSSAT
-  MAX7456_WriteString("SAT", DEBUGDPOSSAT);
+  OSD_WriteString("SAT", DEBUGDPOSSAT);
   itoa(GPS_numSat, screenBuffer, 10);
-  MAX7456_WriteString(screenBuffer, DEBUGDPOSSAT + 5);
+  OSD_WriteString(screenBuffer, DEBUGDPOSSAT + 5);
 #endif
 #ifdef DEBUGDPOSARMED
-  MAX7456_WriteString("ARM", DEBUGDPOSARMED);
+  OSD_WriteString("ARM", DEBUGDPOSARMED);
   itoa(armed, screenBuffer, 10);
-  MAX7456_WriteString(screenBuffer, DEBUGDPOSARMED + 5);
+  OSD_WriteString(screenBuffer, DEBUGDPOSARMED + 5);
 #endif
 #ifdef DEBUGDPOSPACKET
-  MAX7456_WriteString("PKT", DEBUGDPOSPACKET);
+  OSD_WriteString("PKT", DEBUGDPOSPACKET);
   itoa(packetrate, screenBuffer, 10);
-  MAX7456_WriteString(screenBuffer, DEBUGDPOSPACKET + 5);
+  OSD_WriteString(screenBuffer, DEBUGDPOSPACKET + 5);
 #endif
 #ifdef DEBUGDPOSRX
-  MAX7456_WriteString("RX", DEBUGDPOSRX);
+  OSD_WriteString("RX", DEBUGDPOSRX);
   itoa(serialrxrate, screenBuffer, 10);
-  MAX7456_WriteString(screenBuffer, DEBUGDPOSRX + 5);
+  OSD_WriteString(screenBuffer, DEBUGDPOSRX + 5);
 #endif
 #ifdef DEBUGDPOSMSPID
-  MAX7456_WriteString("MSP ID", DEBUGDPOSMSPID);
+  OSD_WriteString("MSP ID", DEBUGDPOSMSPID);
   for (uint8_t id_row = 0; id_row <= 6; id_row++) {
     for (uint8_t id_col = 0; id_col <= 4; id_col++) {
       itoa(boxidarray[(id_row * 5) + (id_col)], screenBuffer, 10);
-      MAX7456_WriteString(screenBuffer, DEBUGDPOSMSPID + 5 + LINE + (id_row * LINE) + (id_col * 3));
+      OSD_WriteString(screenBuffer, DEBUGDPOSMSPID + 5 + LINE + (id_row * LINE) + (id_col * 3));
     }
   }
   for (uint8_t id_bit_2 = 0; id_bit_2 <= 1; id_bit_2++) {
     itoa(id_bit_2, screenBuffer, 10);
-    MAX7456_WriteString(screenBuffer, DEBUGDPOSMSPID + 3 + (LINE * 9 + (id_bit_2 * LINE)));
+    OSD_WriteString(screenBuffer, DEBUGDPOSMSPID + 3 + (LINE * 9 + (id_bit_2 * LINE)));
     for (uint8_t id_bit = 0; id_bit <= 16; id_bit++) {
       uint8_t active = (MwSensorActive & (1UL << (id_bit + (id_bit_2 * 16)))) != 0;
       itoa(active, screenBuffer, 10);
-      MAX7456_WriteString(screenBuffer, DEBUGDPOSMSPID + 5 + (LINE * 9 + (id_bit_2 * LINE)) + (id_bit));
+      OSD_WriteString(screenBuffer, DEBUGDPOSMSPID + 5 + (LINE * 9 + (id_bit_2 * LINE)) + (id_bit));
     }
   }
 #endif
 #if defined (MEMCHECK)
 #ifdef DEBUGDPOSMEMORY
-  MAX7456_WriteString("MEM", DEBUGDPOSMEMORY);
+  OSD_WriteString("MEM", DEBUGDPOSMEMORY);
   itoa(UntouchedStack(), screenBuffer, 10);
-  MAX7456_WriteString(screenBuffer, DEBUGDPOSMEMORY + 5);
+  OSD_WriteString(screenBuffer, DEBUGDPOSMEMORY + 5);
 #endif
 #endif
 
@@ -2180,7 +2180,7 @@ void displayCells(void) {
 
   if (cells) {
     screenBuffer[cells] = 0;
-    MAX7456_WriteString(screenBuffer, getPosition(SportPosition) + (6 - cells)); //bar chart
+    OSD_WriteString(screenBuffer, getPosition(SportPosition) + (6 - cells)); //bar chart
 
     ItoaPadded(low, screenBuffer + 1, 4, 2);
     screenBuffer[0] = SYM_MIN;
@@ -2188,7 +2188,7 @@ void displayCells(void) {
     screenBuffer[6] = 0;
 
     if ((low > MIN_CELL) || (timer.Blink2hz))
-      MAX7456_WriteString(screenBuffer, getPosition(SportPosition) + LINE); //lowest
+      OSD_WriteString(screenBuffer, getPosition(SportPosition) + LINE); //lowest
 
     uint16_t avg = 0;
     if (cells)avg = sum / cells;
@@ -2198,7 +2198,7 @@ void displayCells(void) {
     screenBuffer[6] = 0;
 
     if ((avg > MIN_CELL) || (timer.Blink2hz))
-      MAX7456_WriteString(screenBuffer, getPosition(SportPosition) + (2 * LINE)); //average
+      OSD_WriteString(screenBuffer, getPosition(SportPosition) + (2 * LINE)); //average
   }
 }
 
@@ -2356,15 +2356,15 @@ void mapmode(void) {
 
     screenBuffer[0] = mapsymbolrange;
     screenBuffer[1] = 0;
-    MAX7456_WriteString(screenBuffer, getPosition(MapModePosition));
+    OSD_WriteString(screenBuffer, getPosition(MapModePosition));
 
     screenBuffer[0] = mapsymboltarget;
     screenBuffer[1] = 0;
-    MAX7456_WriteString(screenBuffer, targetpos);
+    OSD_WriteString(screenBuffer, targetpos);
 
     screenBuffer[0] = mapsymbolcenter;
     screenBuffer[1] = 0;
-    MAX7456_WriteString(screenBuffer, centerpos);
+    OSD_WriteString(screenBuffer, centerpos);
   }
 
 #endif
@@ -2407,7 +2407,7 @@ void displayfwglidescope(void) {
 
 
 void Menuconfig_onoff(uint16_t pos, uint8_t setting) {
-  MAX7456_WriteString_P(PGMSTR(&(menu_on_off[(Settings[setting])])), pos);
+  OSD_WriteString_P(PGMSTR(&(menu_on_off[(Settings[setting])])), pos);
 }
 
 
@@ -2511,7 +2511,7 @@ void displayArmed(void)
       queueindexbit = i;
   }
   if (alarms.active > 1) {
-    MAX7456_WriteString_P(PGMSTR(&(alarm_text[queueindexbit])), getPosition(motorArmedPosition));
+    OSD_WriteString_P(PGMSTR(&(alarm_text[queueindexbit])), getPosition(motorArmedPosition));
   }
 }
 
@@ -2530,7 +2530,7 @@ void displayAlarms() {
     return;
   }
   if (alarmState == ALARM_CRIT || alarmState == ALARM_ERROR || timer.Blink2hz) {
-    MAX7456_WriteString((const char*)alarmMsg, getPosition(motorArmedPosition));
+    OSD_WriteString((const char*)alarmMsg, getPosition(motorArmedPosition));
   }
 }
 #endif
@@ -2626,16 +2626,16 @@ void displayItem(uint16_t t_position, int16_t t_value, uint8_t t_leadicon, uint8
     screenBuffer[t_offset++] = t_trailicon;
     screenBuffer[t_offset] = 0;
   }
-  MAX7456_WriteString(screenBuffer, getPosition(t_position));
+  OSD_WriteString(screenBuffer, getPosition(t_position));
 }
 
 
 void displayDateTime(void)
 {
   formatDateTime(datetime.hours, datetime.minutes, datetime.seconds, ':', 1);
-  MAX7456_WriteString(screenBuffer, getPosition(GPS_timePosition));
+  OSD_WriteString(screenBuffer, getPosition(GPS_timePosition));
   formatDateTime(datetime.day, datetime.month, datetime.year, '/', 1);
-  MAX7456_WriteString(screenBuffer, LINE + getPosition(GPS_timePosition));
+  OSD_WriteString(screenBuffer, LINE + getPosition(GPS_timePosition));
 }
 
 void formatDateTime(uint8_t digit1, uint8_t digit2, uint8_t digit3, uint8_t seperator, uint8_t dtsize) {
@@ -2738,7 +2738,7 @@ void displayGimbal(void){
     screenBuffer[0] = SYM_GIMBAL;
     screenBuffer[1] = SYM_GIMBAL1;
     if (fieldIsVisible(gimbalPosition))
-      MAX7456_WriteString(screenBuffer, getPosition(gimbalPosition));
+      OSD_WriteString(screenBuffer, getPosition(gimbalPosition));
   }
 }
 
@@ -2761,6 +2761,6 @@ void displayVTXvalues(void){
 #endif // DISPLAY_VTX_PWR
     screenBuffer[t_idx++] = 0;    
     if (fieldIsVisible(gimbalPosition))
-      MAX7456_WriteString(screenBuffer, getPosition(gimbalPosition));   
+      OSD_WriteString(screenBuffer, getPosition(gimbalPosition));   
 }  
 #endif

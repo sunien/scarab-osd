@@ -179,7 +179,7 @@ void setup()
   WireUB.setWriteTimo((1000000UL) / (I2C_UB_BREQUIV / 10) * 3);
 #endif
 
-  MAX7456SETHARDWAREPORTS
+  OSDSETHARDWAREPORTS
   ATMEGASETHARDWAREPORTS
   LEDINIT
 
@@ -204,7 +204,7 @@ void setup()
 # endif
 #endif
 
-  MAX7456Setup();
+  OSD_Setup();
 #if defined GPSOSD
   timer.GPS_initdelay = INTRO_DELAY;
 #else
@@ -249,21 +249,21 @@ void loop()
 {
   switch (fontStatus) {
     case 0:
-      MAX7456_WriteString_P(messageF0, 32);
-      MAX7456_DrawScreen();
+      OSD_WriteString_P(messageF0, 32);
+      OSD_DrawScreen();
       delay(3000);
-      displayFont();
-      MAX7456_WriteString_P(messageF1, 32);
-      MAX7456_DrawScreen();
+      OSD_DisplayFont();
+      OSD_WriteString_P(messageF1, 32);
+      OSD_DrawScreen();
       fontStatus++;
       delay(3000);
       break;
     case 1:
-      updateFont();
-      MAX7456Setup();
-      MAX7456_WriteString_P(messageF2, 32);
-      displayFont();
-      MAX7456_DrawScreen();
+      OSD_UpdateFont();
+      OSD_Setup();
+      OSD_WriteString_P(messageF2, 32);
+      OSD_DisplayFont();
+      OSD_DrawScreen();
       fontStatus++;
       break;
   }
@@ -272,9 +272,9 @@ void loop()
 #elif defined DISPLAYFONTS
 void loop()
 {
-  MAX7456Setup();
-  displayFont();
-  MAX7456_DrawScreen();
+  OSD_Setup();
+  OSD_DisplayFont();
+  OSD_DrawScreen();
 }
 #else
 
@@ -597,7 +597,7 @@ void loop()
         }
       }
 #endif // KISS
-      MAX7456_DrawScreen();
+      OSD_DrawScreen();
     }
 
 #ifdef SBUS_CONTROL
@@ -641,7 +641,7 @@ void loop()
       {
         // In canvas mode, we don't actively write the screen; just listen to MSP stream.
         if (lastCanvas + CANVAS_TIMO < currentMillis) {
-          MAX7456_ClearScreen();
+          OSD_ClearScreen();
           canvasMode = false;
         }
       }
@@ -839,7 +839,7 @@ void loop()
     onTime++;
 #if defined(AUTOCAM) || defined(MAXSTALLDETECT)
     if (!fontMode)
-      MAX7456CheckStatus();
+      OSD_CheckStatus();
 #endif
 #ifdef ALARM_GPS
     if (timer.GPS_active == 0) {
@@ -940,7 +940,7 @@ void fontCharacterReceived(uint8_t cindex) {
   if (retransmitQueue & bit) {
     // this char war requested and now received for the first time
     retransmitQueue &= ~bit;  // mark as already received
-    write_NVM(cindex);       // Write to MVRam
+    OSD_WriteNVM(cindex);    // Write to MVRam
   }
 }
 
@@ -1289,27 +1289,27 @@ void ProcessSensors(void) {
     sensortemp = analogRead(sensorpinarray[sensor]);
     //--- override with FC voltage data if enabled
     if (sensor == 0) {
-      if (Settings[S_MAINVOLTAGE_VBAT] == V_MAINVOLTAGE_VBAT_FROM_FLIGHTCONTROLLER) {
+      if (Settings[S_MAINVOLTAGE_VBAT]) {
         sensortemp = MwVBat;
       }
     }
 #ifdef MAV_VBAT2
     // assume vbat2 on FC if vbat1 is
     if (sensor == 1) {
-      if (Settings[S_MAINVOLTAGE_VBAT] == V_MAINVOLTAGE_VBAT_FROM_FLIGHTCONTROLLER) {
+      if (Settings[S_MAINVOLTAGE_VBAT]) {
         sensortemp = MwVBat2;
       }
     }
 #endif
     //--- override with PWM, FC RC CH or FC RSSI data if enabled
     if (sensor == 4) {
-      if (Settings[S_MWRSSI] == V_MWRSSI_FROM_TX_CHANNEL) {
+      if (Settings[S_MWRSSI] == 3) { // RSSI from a TX channel
         sensortemp = MwRcData[Settings[S_RSSI_CH]] >> 1;
       }
-      else if (Settings[S_MWRSSI] == V_MWRSSI_FROM_FLIGHTCONTROLLER) {
+      else if (Settings[S_MWRSSI] == 2) { // RSSI from Flight controller
         sensortemp = MwRssi;
       }
-      else if (Settings[S_MWRSSI] == V_MWRSSI_FROM_DIRECT_OSD_PWN) {
+      else if (Settings[S_MWRSSI] == 1) { // RSSI from direct OSD - PWM
         sensortemp = pwmRSSI >> 1;
         if (sensortemp == 0) { // timed out - use previous
           sensortemp = sensorfilter[sensor][sensorindex];
@@ -1342,7 +1342,7 @@ void ProcessSensors(void) {
   }
 
   //-------------- Voltage
-  if (Settings[S_MAINVOLTAGE_VBAT] ==  V_MAINVOLTAGE_VBAT_FROM_ANALOG_PIN) {
+  if (!Settings[S_MAINVOLTAGE_VBAT]) { // not MWII
     uint16_t voltageRaw = sensorfilter[0][SENSORFILTERSIZE];
     if (Settings[S_VREFERENCE]) {
       voltage = float(voltageRaw) * Settings[S_DIVIDERRATIO] * (DIVIDER5v);

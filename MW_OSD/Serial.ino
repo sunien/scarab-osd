@@ -323,9 +323,9 @@ void serialMSPCheck()
       }
       else if(dataSize == 56) {
         uint8_t c = serialBuffer[55];
-        write_NVM(c);
+         OSD_WriteNVM(c);
         if (c==255)
-          MAX7456Setup();
+          OSD_Setup();
       }
     }
     if(cmd == OSD_DEFAULT) {
@@ -390,7 +390,7 @@ For sub-command 3 (draw string):
       break;
 
     case 2: // Clear canvas
-      MAX7456_ClearScreen();
+      OSD_ClearScreen();
       break;
 
     case 3: // Draw string at (row,col) with attribute (if supported)
@@ -404,9 +404,9 @@ For sub-command 3 (draw string):
           break;
         canvasc[1] = 0;
 #ifdef INVERTED_CHAR_SUPPORT
-        MAX7456_WriteStringWithAttr(canvasc, canvasy * LINE + canvasx, canvasa);
+        OSD_WriteStringWithAttr(canvasc, canvasy * LINE + canvasx, canvasa);
 #else
-        MAX7456_WriteString(canvasc, canvasy * LINE + canvasx);
+        OSD_WriteString(canvasc, canvasy * LINE + canvasx);
 #endif
         ++canvasx;
       }
@@ -1111,15 +1111,15 @@ if((MwRcData[PITCHSTICK]>MAXSTICK)&&(MwRcData[YAWSTICK]>MAXSTICK)&&(MwRcData[THR
       if(configMode&&(MwRcData[ROLLSTICK]>MAXSTICK)) // MOVE RIGHT
 #endif
       {
-	      waitStick = 1;
-	      COL++;
+	waitStick = 1;
+	COL++;
 
  #ifdef MENU_KISS
         if (ROW == 10 && subConfigPage >= 0 && COL == 2) {
           COL=3;
         }
  #endif // MENU_KISS
-	      if(COL>3) COL=3;
+	if(COL>3) COL=3;
       }
 #ifdef TX_MODE1
       else if(configMode&&(MwRcData[YAWSTICK]<MINSTICK)) // MOVE LEFT
@@ -1127,8 +1127,8 @@ if((MwRcData[PITCHSTICK]>MAXSTICK)&&(MwRcData[YAWSTICK]>MAXSTICK)&&(MwRcData[THR
       else if(configMode&&(MwRcData[ROLLSTICK]<MINSTICK)) // MOVE LEFT
 #endif
       {
-	      waitStick = 1;
-	      COL--;
+	waitStick = 1;
+	COL--;
 #ifdef MENU_KISS
         if (ROW == 10 && subConfigPage >= 0  && COL == 2) {
           COL=1;

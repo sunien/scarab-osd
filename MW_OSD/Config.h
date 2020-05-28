@@ -17,6 +17,7 @@
 //#define IMPULSERC_HELIX           // Uncomment this if using an ImpulseRC integrated OSD/VTX (STILL UNDER DEVELOPMENT PENDING TESTING)
 //#define FFPV_INNOVA               // Uncomment this if using a FURIOUS FPV Innova integrated OSD/VTX (STILL UNDER DEVELOPMENT PENDING TESTING)
 //#define STEELEPDB                   // Uncomment this if using STEELEPDB
+#define PIXELOSD                  // Uncomment this if using a FrSky PixelOSD with ATMega328P based controller (STILL UNDER DEVELOPMENT PENDING TESTING)
 
 // NOTE-some boards have swapped bat1/bat2 pins and alternative voltage measuring resistors
 // If having difficulties, first select default MINIMOSD as above, then use the following to correct:
