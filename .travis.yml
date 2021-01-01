@@ -10,7 +10,7 @@ env:
 - PLATFORMIO_CI_SRC=MW_OSD/
 install:
 - pip install -U platformio
-- platformio update
+- platformio upgrade --dev
 - pio update
 script:
 - platformio run
